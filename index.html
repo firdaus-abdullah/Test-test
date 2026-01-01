@@ -3,46 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join-DigitalWorld Link</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/otplib/12.0.1/otplib-browser.js"></script>
-    <style>
-        body { font-family: -apple-system, sans-serif; text-align: center; padding: 50px; background: #fafafa; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: inline-block; }
-        .code { font-size: 3em; font-weight: bold; color: #007bff; margin: 20px 0; }
-        input { padding: 10px; width: 80%; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .btn { display: block; background: #28a745; color: white; padding: 10px; text-decoration: none; border-radius: 5px; margin-top: 10px; }
-    </style>
+    <title>Netflix Code Linker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="card">
-        <h2>My Verification Code</h2>
-        <input type="text" id="mySecret" placeholder="Paste Secret Key from Join-DigitalWorld">
+        <img src="https://www.google.com/s2/favicons?domain=join-digitalworld.com&sz=64" alt="logo">
+        <h2>Order ID Sync</h2>
         
-        <div class="code" id="displayCode">------</div>
+        <input type="text" id="orderIdInput" placeholder="Enter Order ID (e.g. #000411)">
+        
+        <button id="submitBtn" class="btn">Get Verification Code</button>
 
-        <a href="https://www.join-digitalworld.com/nf/get-code" target="_blank" class="btn">
-            Go to Join-DigitalWorld
-        </a>
+        <div id="resultArea" style="margin-top: 20px; display: none;">
+            <p>Your Netflix Code:</p>
+            <div class="code" id="displayCode">------</div>
+        </div>
+        
+        <p class="footer-text">This will link to Join-DigitalWorld</p>
     </div>
 
-    <script>
-        const { authenticator } = window.otplib;
-        const input = document.getElementById('mySecret');
-        const display = document.getElementById('displayCode');
-
-        // Check for new code every second
-        setInterval(() => {
-            const secret = input.value.trim();
-            if (secret) {
-                try {
-                    display.innerText = authenticator.generate(secret);
-                } catch (e) {
-                    display.innerText = "Error";
-                }
-            }
-        }, 1000);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
 
