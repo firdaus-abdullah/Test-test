@@ -1,23 +1,22 @@
-const { authenticator } = window.otplib;
-const input = document.getElementById('mySecret');
-const display = document.getElementById('displayCode');
-
-function updateCode() {
-    const secret = input.value.trim();
-    if (secret) {
-        try {
-            // This generates the 6-digit code using the secret and current time
-            display.innerText = authenticator.generate(secret);
-        } catch (e) {
-            display.innerText = "Error";
-        }
-    } else {
-        display.innerText = "------";
+document.getElementById('submitBtn').addEventListener('click', function() {
+    const orderId = document.getElementById('orderIdInput').value.trim();
+    
+    if (!orderId) {
+        alert("Please enter an Order ID first!");
+        return;
     }
-}
 
-// Update the code every 1 second to stay synced with the server
-setInterval(updateCode, 1000);
+    // 1. Show the result area
+    document.getElementById('resultArea').style.display = "block";
+    document.getElementById('displayCode').innerText = "FETCHING...";
 
-// Also update immediately when you paste the secret
-input.addEventListener('input', updateCode);
+    // 2. This attempts to open their "get-code" page with your ID
+    // Note: Since we can't 'hack' their box, we redirect with the data
+    const targetUrl = `https://www.join-digitalworld.com/nf/get-code?order_id=${encodeURIComponent(orderId)}`;
+    
+    // 3. We open it in a new tab so you can see the result they give you
+    window.open(targetUrl, '_blank');
+    
+    document.getElementById('displayCode').innerText = "CHECK TAB";
+});
+
