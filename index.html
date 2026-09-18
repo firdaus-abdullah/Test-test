@@ -193,7 +193,7 @@ function person(o) {
   s += `<rect x="30" y="74" width="16" height="74" rx="8" fill="${body}"/>`;
   s += `<rect x="114" y="74" width="16" height="74" rx="8" fill="${body}"/>`;
 
-  /* sterile gown */
+  /* sterile gown / jumpsuit */
   if (o.gown) {
     s += `<path d="M50 74 Q80 62 110 74 L118 132 L114 182 L46 182 L42 132 Z"
             fill="#ffffff" stroke="#d3dfeb" stroke-width="2"/>`;
@@ -216,11 +216,18 @@ function person(o) {
   s += `<rect x="72" y="54" width="16" height="22" rx="6" fill="${skin}"/>`;
   s += `<circle cx="80" cy="42" r="24" fill="${skin}"/>`;
 
-  /* hair or hood */
+  /* hair / hairnet / sterile hood */
   if (o.hood) {
+    /* sterile hood */
     s += `<circle cx="80" cy="42" r="30" fill="#eef4fb" stroke="#cfdceb" stroke-width="2"/>`;
     s += `<ellipse cx="80" cy="45" rx="16.5" ry="19" fill="${skin}"/>`;
+  } else if (o.hairnet) {
+    /* cleanroom hairnet */
+    s += `<path d="M56 42 a24 24 0 0 1 48 0 z" fill="#d9eaf7" stroke="#a8c8e0" stroke-width="1.5"/>`;
+    s += `<line x1="60" y1="30" x2="100" y2="30" stroke="#a8c8e0" stroke-width="1" opacity="0.6"/>`;
+    s += `<line x1="58" y1="36" x2="102" y2="36" stroke="#a8c8e0" stroke-width="1" opacity="0.6"/>`;
   } else {
+    /* default hair */
     s += `<path d="M58 40 a22 22 0 0 1 44 0 z" fill="#3a2f2a"/>`;
   }
 
@@ -276,39 +283,39 @@ const steps = [
     fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc' }
   },
   {
-    title: 'Don Clean Socks',
-    desc: 'Sit on the bench and put on clean, sterile socks. Ensure they cover the ankles and are free of lint or holes.',
-    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', socks: true }
+    title: 'Don Hairnet & Face Mask',
+    desc: 'After the coverall, put on a cleanroom hairnet to contain all hair, then fit the face mask over nose and mouth and press the nose clip for a tight seal.',
+    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', hairnet: true, mask: true }
   },
   {
-    title: 'Don Sterile Gown & Sterile Booties',
-    desc: 'Open the sterile gown pack, slide both arms into the sleeves and secure the ties. Then put on sterile booties, ensuring they fully cover the socks and lower legs.',
-    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, gown: true }
+    title: 'Don Clean Socks',
+    desc: 'Sit on the bench and put on clean, sterile socks. Ensure they cover the ankles and are free of lint or holes.',
+    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', hairnet: true, mask: true, socks: true }
   },
   {
     title: 'Don Sterile Gloves (Inner)',
-    desc: 'Put on the first pair of sterile gloves, pulling the cuff down over the gown sleeve. Inspect for punctures or tears. Don before the sterile hood.',
-    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, gown: true, gloveColor: '#4fa8dd' }
+    desc: 'Put on the first pair of sterile gloves. Don after clean socks, pulling the cuff over the coverall sleeve. Inspect for punctures or tears.',
+    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', hairnet: true, mask: true, socks: true, gloveColor: '#4fa8dd' }
   },
   {
-    title: 'Don Sterile Hood & Face Mask',
-    desc: 'Tuck all hair inside the sterile hood. Fit the mask over nose and mouth and press the nose clip down to form a tight seal.',
-    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, gown: true, gloveColor: '#4fa8dd', hood: true, mask: true }
+    title: 'Don Sterile Jumpsuit — Start with Hood, then Jumpsuit',
+    desc: 'Open the sterile jumpsuit pack. First don the hood, tucking in the hairnet, then step into the jumpsuit and secure the zip. Put on sterile booties over the socks.',
+    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, hood: true, mask: true, gloveColor: '#4fa8dd', gown: true }
   },
   {
     title: 'Don Outer Sterile Gloves',
     desc: 'Apply a second sterile glove pair over the first (double gloving), then sanitise the outer gloves with IPA.',
-    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, gown: true, hood: true, mask: true, gloveColor: '#3f93cc' }
+    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, hood: true, mask: true, gloveColor: '#3f93cc', gown: true }
   },
   {
     title: 'Don Safety Goggles',
     desc: 'Place goggles over the mask and hood, adjusting the strap so there are no gaps around the eyes. Don after the second layer of sterile gloves.',
-    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, gown: true, hood: true, mask: true, gloveColor: '#3f93cc', goggles: true }
+    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, hood: true, mask: true, gloveColor: '#3f93cc', goggles: true, gown: true }
   },
   {
     title: 'Final Check & Enter Cleanroom',
     desc: 'Inspect the mirror for exposed skin or gaps. Confirm gown integrity, then pass through the airlock into the cleanroom.',
-    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, gown: true, hood: true, mask: true, gloveColor: '#3f93cc', goggles: true, check: true }
+    fig: { bodyColor: '#8fb8de', legsColor: '#6fa0cc', booties: true, hood: true, mask: true, gloveColor: '#3f93cc', goggles: true, gown: true, check: true }
   }
 ];
 
