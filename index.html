@@ -88,7 +88,7 @@
     border: 1px solid #dbe4ee;
     border-radius: 12px;
     background: #fbfdff;
-    padding: 14px 16px 14px 132px;
+    padding: 14px 96px 14px 132px;
     min-height: 180px;
   }
   .card .fig {
@@ -111,6 +111,26 @@
     color: #5b7691;
   }
 
+  /* per-step download button */
+  .card .dl-step {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #eef4fb;
+    color: #1e6fb8;
+    border: 1px solid #cfe0f0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .card .dl-step:hover { background: #dbeaf8; }
+  .card .dl-step:disabled { opacity: .55; cursor: wait; }
+
   /* ---------- footer ---------- */
   .foot {
     margin-top: 22px;
@@ -126,6 +146,7 @@
     #poster { width: 100%; }
     .grid { grid-template-columns: 1fr; }
     .toolbar { max-width: 100%; }
+    .card { padding-right: 110px; }
   }
 </style>
 </head>
@@ -133,7 +154,7 @@
 
 <div class="toolbar">
   <span id="status"></span>
-  <button id="dl">⬇ Download as JPG</button>
+  <button id="dl">⬇ Download full poster as JPG</button>
 </div>
 
 <div id="poster">
@@ -171,22 +192,18 @@ function person(o) {
   s += `<rect x="56" y="144" width="20" height="62" rx="9" fill="${legs}"/>`;
   s += `<rect x="84" y="144" width="20" height="62" rx="9" fill="${legs}"/>`;
 
-  /* footwear: socks / booties / shoes */
+  /* footwear: socks / sterile booties / street shoes */
   if (o.socks) {
-    // clean socks (white)
     s += `<rect x="54" y="176" width="24" height="40" rx="8" fill="#ffffff" stroke="#cccccc" stroke-width="1.5"/>`;
     s += `<rect x="82" y="176" width="24" height="40" rx="8" fill="#ffffff" stroke="#cccccc" stroke-width="1.5"/>`;
-    // subtle toe line
     s += `<line x1="54" y1="210" x2="78" y2="210" stroke="#cccccc" stroke-width="1.5"/>`;
     s += `<line x1="82" y1="210" x2="106" y2="210" stroke="#cccccc" stroke-width="1.5"/>`;
   } else if (o.booties) {
-    // sterile booties
     s += `<rect x="52" y="176" width="28" height="36" rx="9" fill="#4a90d9"/>`;
     s += `<rect x="80" y="176" width="28" height="36" rx="9" fill="#4a90d9"/>`;
     s += `<rect x="46" y="200" width="34" height="20" rx="8" fill="#2f6db3"/>`;
     s += `<rect x="80" y="200" width="34" height="20" rx="8" fill="#2f6db3"/>`;
   } else {
-    // street shoes
     s += `<rect x="48" y="198" width="32" height="20" rx="8" fill="${shoe}"/>`;
     s += `<rect x="80" y="198" width="32" height="20" rx="8" fill="${shoe}"/>`;
   }
@@ -261,7 +278,7 @@ function person(o) {
 }
 
 /* ============================================================
-   STEP DEFINITIONS (updated order & clean socks / sterile booties)
+   STEP DEFINITIONS
    ============================================================ */
 const steps = [
   {
@@ -332,18 +349,82 @@ steps.forEach(function (st) {
 grid.innerHTML = html;
 
 /* ============================================================
-   DOWNLOAD AS JPG
+   HELPERS
+   ============================================================ */
+function slugify(text) {
+  return text.toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function flash(el, msg, ms) {
+  if (!el) return;
+  el.textContent = msg;
+  setTimeout(function () { el.textContent = ''; }, ms || 2500);
+}
+
+/* ============================================================
+   PER-STEP DOWNLOAD BUTTONS
+   ============================================================ */
+const cards = grid.querySelectorAll('.card');
+
+cards.forEach(function (card, i) {
+  const stepBtn = document.createElement('button');
+  stepBtn.type = 'button';
+  stepBtn.className = 'dl-step';
+  stepBtn.textContent = '⬇ JPG';
+  stepBtn.title = 'Download this step as JPG';
+  card.appendChild(stepBtn);
+
+  stepBtn.addEventListener('click', function () {
+    if (typeof html2canvas === 'undefined') {
+      flash(statusEl, 'Library not loaded — check your internet connection.');
+      return;
+    }
+    stepBtn.disabled = true;
+    const previous = stepBtn.style.display;
+    stepBtn.style.display = 'none';           // keep button out of the capture
+
+    html2canvas(card, {
+      backgroundColor: '#ffffff',
+      scale: 3,
+      useCORS: true,
+      logging: false
+    }).then(function (canvas) {
+      const a = document.createElement('a');
+      a.download = 'gowning-step-' + slugify(steps[i].title) + '.jpg';
+      a.href = canvas.toDataURL('image/jpeg', 0.95);
+      a.click();
+      stepBtn.style.display = previous;
+      stepBtn.disabled = false;
+      flash(statusEl, 'Step downloaded ✓');
+    }).catch(function (err) {
+      console.error(err);
+      stepBtn.style.display = previous;
+      stepBtn.disabled = false;
+      flash(statusEl, 'Could not export this step.');
+    });
+  });
+});
+
+/* ============================================================
+   FULL POSTER DOWNLOAD
    ============================================================ */
 const btn = document.getElementById('dl');
 const statusEl = document.getElementById('status');
 
 btn.addEventListener('click', function () {
   if (typeof html2canvas === 'undefined') {
-    statusEl.textContent = 'Library not loaded — check your internet connection.';
+    flash(statusEl, 'Library not loaded — check your internet connection.');
     return;
   }
   btn.disabled = true;
   statusEl.textContent = 'Generating image…';
+
+  // hide all per-step buttons so they don't appear in the poster image
+  const stepButtons = grid.querySelectorAll('.dl-step');
+  stepButtons.forEach(function (b) { b.style.display = 'none'; });
 
   const poster = document.getElementById('poster');
 
@@ -359,11 +440,13 @@ btn.addEventListener('click', function () {
     link.download = 'cleanroom-gowning-procedure.jpg';
     link.href = canvas.toDataURL('image/jpeg', 0.95);
     link.click();
+    stepButtons.forEach(function (b) { b.style.display = ''; });
     statusEl.textContent = 'Downloaded ✓';
     btn.disabled = false;
     setTimeout(function () { statusEl.textContent = ''; }, 2500);
   }).catch(function (err) {
     console.error(err);
+    stepButtons.forEach(function (b) { b.style.display = ''; });
     statusEl.textContent = 'Something went wrong. Try Chrome or Edge.';
     btn.disabled = false;
   });
